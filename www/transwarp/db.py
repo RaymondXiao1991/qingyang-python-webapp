@@ -9,8 +9,37 @@ Database operation module.
 
 import time, uuid, functools, threading, logging
 
-# USER DICT
+# DICT OBJECT
 class Dict(dict):
+    '''
+    Simple dict but support access as x.y style.
+
+    >>> d1 = Dict()
+    >>> d1['x'] = 100
+    >>> d1.x
+    100
+    >>> d1.y = 200
+    >>> d1['y']
+    200
+    >>> d2 = Dict(a=1, b=2, c='3')
+    >>> d2.c
+    '3'
+    >>> d2['empty']
+    Traceback (most recent call last):
+        ...
+    KeyError: 'empty'
+    >>> d2.empty
+    Traceback (most recent call last):
+        ...
+    AttributeError: 'Dict' object has no attribute 'empty'
+    >>> d3 = Dict(('a', 'b', 'c'), (1, 2, 3))
+    >>> d3.a
+    1
+    >>> d3.b
+    2
+    >>> d3.c
+    3
+    '''
     def __init__(self, names=(), values=(), **kw):
         super(Dict, self).__init__(**kw)
         for k, v in zip(names, values):
@@ -24,13 +53,6 @@ class Dict(dict):
 
     def __setattr__(self, key, value):
         self[key] = value
-
-# CONNNECT
-class _Engine(object):
-    def __init__(self, connnect):
-        self._connect = connnect
-    def connnect(self):
-        return self._connect()
 
 # USER_ID
 '''
@@ -82,7 +104,7 @@ def _profiling(start, sql=''):
 class DBError(Exception): 
     pass 
 
-class MultiColumnError(DBError): 
+class MultiColumnsError(DBError): 
     pass 
 
 class _LasyConnection(object):
@@ -130,7 +152,6 @@ class _DbCtx(threading.local):
 
     def cleanup(self): 
         self.connection.cleanup() 
-        self.connection = None 
 
 
     def cursor(self): 
@@ -139,25 +160,19 @@ class _DbCtx(threading.local):
         ''' 
         return self.connection.cursor() 
 
-
 # thread-local db context: 
 _db_ctx = _DbCtx() 
-
 
 # global engine object: 
 engine = None 
 
-
 class _Engine(object): 
-
 
     def __init__(self, connect): 
         self._connect = connect 
 
-
     def connect(self): 
         return self._connect() 
-
 
 def create_engine(user, password, database, host='127.0.0.1', port=3306, **kw): 
     import mysql.connector 
@@ -193,12 +208,10 @@ class _ConnectionCtx(object):
             self.should_cleanup = True 
         return self 
 
-
     def __exit__(self, exctype, excvalue, traceback): 
         global _db_ctx 
         if self.should_cleanup: 
             _db_ctx.cleanup() 
-
 
 def connection(): 
     ''' 
@@ -235,7 +248,6 @@ class _TransactionCtx(object):
         pass 
     ''' 
 
-
     def __enter__(self): 
         global _db_ctx 
         self.should_close_conn = False 
@@ -246,7 +258,6 @@ class _TransactionCtx(object):
         _db_ctx.transactions = _db_ctx.transactions + 1 
         logging.info('begin transaction...' if _db_ctx.transactions==1 else 'join current transaction...') 
         return self 
-
 
     def __exit__(self, exctype, excvalue, traceback): 
         global _db_ctx 
@@ -261,7 +272,6 @@ class _TransactionCtx(object):
             if self.should_close_conn: 
                 _db_ctx.cleanup() 
 
-
     def commit(self): 
         global _db_ctx 
         logging.info('commit transaction...') 
@@ -274,13 +284,11 @@ class _TransactionCtx(object):
             logging.warning('rollback ok.') 
             raise 
 
-
     def rollback(self): 
         global _db_ctx 
         logging.warning('rollback transaction...') 
         _db_ctx.connection.rollback() 
         logging.info('rollback ok.') 
-
 
 def transaction(): 
     ''' 
@@ -308,7 +316,6 @@ def transaction():
     [] 
     ''' 
     return _TransactionCtx() 
-
 
 def with_transaction(func): 
     ''' 
@@ -385,7 +392,6 @@ def select_one(sql, *args):
     ''' 
     return _select(sql, True, *args) 
 
-
 @with_connection 
 def select_int(sql, *args): 
     ''' 
@@ -416,7 +422,6 @@ def select_int(sql, *args):
         raise MultiColumnsError('Expect only one column.') 
     return d.values()[0] 
 
-
 @with_connection 
 def select(sql, *args): 
     ''' 
@@ -442,7 +447,6 @@ def select(sql, *args):
     ''' 
     return _select(sql, False, *args) 
 
-
 @with_connection 
 def _update(sql, *args): 
     global _db_ctx 
@@ -462,7 +466,6 @@ def _update(sql, *args):
         if cursor: 
             cursor.close() 
 
-
 def insert(table, **kw): 
     ''' 
     Execute insert SQL. 
@@ -481,7 +484,6 @@ def insert(table, **kw):
     cols, args = zip(*kw.iteritems()) 
     sql = 'insert into `%s` (%s) values (%s)' % (table, ','.join(['`%s`' % col for col in cols]), ','.join(['?' for i in range(len(cols))])) 
     return _update(sql, *args) 
-
 
 def update(sql, *args): 
     r''' 
@@ -506,7 +508,6 @@ def update(sql, *args):
     0 
     ''' 
     return _update(sql, *args) 
-
 
 if __name__=='__main__': 
     logging.basicConfig(level=logging.DEBUG) 
