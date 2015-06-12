@@ -231,21 +231,21 @@ class Model(dict):
 
     @classmethod
     def find_all(cls, *args):
-        L = db.select('select * from `%s`' % cls.__talbe__)
+        L = db.select('select * from `%s`' % cls.__table__)
         return [cls(**d) for d in L]
 
     @classmethod
     def find_by(cls, where, *args):
-        L = db.select('select * from `%s` %s' % (cls.__talbe__, where), *args)
+        L = db.select('select * from `%s` %s' % (cls.__table__, where), *args)
         return [cls(**d) for d in L]
 
     @classmethod
     def count_all(cls):
-        return db.select_int('select count(`%s`) from `%s`' % (cls.__primary_key__.name, cls.__talbe__))
+        return db.select_int('select count(`%s`) from `%s`' % (cls.__primary_key__.name, cls.__table__))
 
     @classmethod
     def count_by(cls, where, *args):
-        return db.select_int('select count(`%s`) from `%s` %s' % (cls.__primary_key__.name, cls.__talbe__, where), *args)
+        return db.select_int('select count(`%s`) from `%s` %s' % (cls.__primary_key__.name, cls.__table__, where), *args)
 
     def insert(self):
         self.pre_insert and self.pre_insert()
