@@ -541,9 +541,10 @@ class StaticFileRoute(object):
         self.route = re.compile('^/static/(.+)$')
 
     def match(self, url):
-        if url.startswitch('/static/'):
+        if url.startswith('/static/'):
             return (url[1:], )
-        return None
+        #return None    #修改'str' object has no attribute 'startswith'的问题
+        return ''
 
     def __call__(self, *args):
         fpath = os.path.join(ctx.application.document_root, args[0])
