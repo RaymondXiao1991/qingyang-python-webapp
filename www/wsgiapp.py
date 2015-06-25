@@ -38,6 +38,7 @@ db.create_engine(**configs.db)
 # 创建一个WSGIApplication:
 wsgi = WSGIApplication(os.path.dirname(os.path.abspath(__file__)))
 # 初始化jinja2模板引擎:
+
 template_engine = Jinja2TemplateEngine(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates'))
 template_engine.add_filter('datetime', datetime_filter)
 
@@ -45,7 +46,11 @@ wsgi.template_engine = template_engine
 
 # 加载带有@get/@post的URL处理函数:
 from transwarp import urls
+
+wsgi.add_interceptor(urls.user_interceptor)
+wsgi.add_interceptor(urls.manage_interceptor)
 wsgi.add_module(urls)
+
 
 # 在9000端口上启动本地测试服务器:
 if __name__ == '__main__':
