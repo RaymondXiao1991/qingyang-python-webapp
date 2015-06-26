@@ -49,7 +49,7 @@ def check_admin():
 def user_interceptor(next):
     logging.info('try to bind user from session cookie...')
     user = None
-    cookie = ctx.request.cookie.get(_COOKIE_NAME)
+    cookie = ctx.request.cookies.get(_COOKIE_NAME)
     if cookie:
         logging.info('parse session cookie...')
         user = parse_signed_cookie(cookie)
