@@ -1,12 +1,16 @@
-#!/usr/bin/python
-# coding: utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 __author__ = 'Raymond Xiao'
+
+'''
+Models for user, blog, comment.
+'''
 
 import time, uuid
 
 from transwarp.db import next_id
-from transwarp.orm import Model, StringField, BoolenField, FloatField, TextField
+from transwarp.orm import Model, StringField, BooleanField, FloatField, TextField
 
 class User(Model):
     __table__ = 'users'
@@ -14,7 +18,7 @@ class User(Model):
     id = StringField(primary_key=True, default=next_id, ddl='varchar(50)')
     email = StringField(updatable=False, ddl='varchar(50)')
     password = StringField(ddl='varchar(50)')
-    admin = BoolenField()
+    admin = BooleanField()
     name = StringField(ddl='varchar(50)')
     image = StringField(ddl='varchar(500)')
     created_time = FloatField(updatable=False, default=time.time)

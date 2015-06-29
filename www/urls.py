@@ -3,6 +3,8 @@
 
 __author__ = 'Raymond Xiao'
 
+__author__ = 'Michael Liao'
+
 import os, re, time, base64, hashlib, logging
 
 from transwarp.web import get, post, ctx, view, interceptor, seeother, notfound
@@ -10,10 +12,9 @@ from transwarp.web import get, post, ctx, view, interceptor, seeother, notfound
 from apis import api, APIError, APIValueError, APIPermissionError, APIResourceNotFoundError
 
 from models import User, Blog, Comment
-
 from config import configs
 
-_COOKIE_NAME = 'cookiesession'
+_COOKIE_NAME = 'qysession'
 _COOKIE_KEY = configs.session.secret
 
 def make_signed_cookie(id, password, max_age):
@@ -43,7 +44,7 @@ def check_admin():
     user = ctx.request.user
     if user and user.admin:
         return
-    raise APIPermissionError('Permission is forbidden.')
+    raise APIPermissionError('No permission.')
 
 @interceptor('/')
 def user_interceptor(next):
@@ -55,8 +56,8 @@ def user_interceptor(next):
         user = parse_signed_cookie(cookie)
         if user:
             logging.info('bind user <%s> to session...' % user.email)
-        ctx.request.user = user
-        return next()
+    ctx.request.user = user
+    return next()
 
 @interceptor('/manage/')
 def manage_interceptor(next):
@@ -69,14 +70,12 @@ def manage_interceptor(next):
 @get('/')
 def index():
     blogs = Blog.find_all()
-    #user = User.find_first('where email=?', 'admin@example.com')
-    #return dict(blogs=blogs, user=user)
     return dict(blogs=blogs, user=ctx.request.user)
 
 @view('signin.html')
 @get('/signin')
 def signin():
-    raise dict()
+    return dict()
 
 @get('/signout')
 def signout():
@@ -96,9 +95,9 @@ def authenticate():
     elif user.password != password:
         raise APIError('auth:failed', 'password', 'Invalid password.')
     # make session cookie:
-    max_age = 604800 if remember == 'true' else None
+    max_age = 604800 if remember=='true' else None
     cookie = make_signed_cookie(user.id, user.password, max_age)
-    ctx.response.set_cookie(_COOKIE_NAME, cookie, make_age=max_age)
+    ctx.response.set_cookie(_COOKIE_NAME, cookie, max_age=max_age)
     user.password = '******'
     return user
 
