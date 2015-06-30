@@ -1,10 +1,10 @@
-#!/usr/bin/python
-# coding: utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 __author__ = 'Raymond Xiao'
 
 '''
-JSON API definition
+JSON API definition.
 '''
 
 import re, json, logging, functools
@@ -12,7 +12,7 @@ import re, json, logging, functools
 from transwarp.web import ctx
 
 def dumps(obj):
-    return json.dump(obj)
+    return json.dumps(obj)
 
 class APIError(StandardError):
     '''
@@ -26,7 +26,7 @@ class APIError(StandardError):
 
 class APIValueError(APIError):
     '''
-    Indicate the input value has error or invalid. The data specifies the error field of input form. 
+    Indicate the input value has error or invalid. The data specifies the error field of input form.
     '''
     def __init__(self, field, message=''):
         super(APIValueError, self).__init__('value:invalid', field, message)
@@ -48,6 +48,7 @@ class APIPermissionError(APIError):
 def api(func):
     '''
     A decorator that makes a function to json api, makes the return value as json.
+
     @app.route('/api/test')
     @api
     def api_test():
@@ -58,7 +59,7 @@ def api(func):
         try:
             r = dumps(func(*args, **kw))
         except APIError, e:
-            r = json.dump(dict(error=e.error, data=e.data, message=e.message))
+            r = json.dumps(dict(error=e.error, data=e.data, message=e.message))
         except Exception, e:
             logging.exception(e)
             r = json.dumps(dict(error='internalerror', data=e.__class__.__name__, message=e.message))
@@ -66,10 +67,6 @@ def api(func):
         return r
     return _wrapper
 
-if __name__ == '__main__':
+if __name__=='__main__':
     import doctest
     doctest.testmod()
-
-
-
-

@@ -3,8 +3,6 @@
 
 __author__ = 'Raymond Xiao'
 
-__author__ = 'Michael Liao'
-
 import os, re, time, base64, hashlib, logging
 
 from transwarp.web import get, post, ctx, view, interceptor, seeother, notfound
@@ -14,7 +12,7 @@ from apis import api, APIError, APIValueError, APIPermissionError, APIResourceNo
 from models import User, Blog, Comment
 from config import configs
 
-_COOKIE_NAME = 'qysession'
+_COOKIE_NAME = 'awesession'
 _COOKIE_KEY = configs.session.secret
 
 def make_signed_cookie(id, password, max_age):
