@@ -12,7 +12,7 @@ from apis import api, APIError, APIValueError, APIPermissionError, APIResourceNo
 from models import User, Blog, Comment
 from config import configs
 
-_COOKIE_NAME = 'awesession'
+_COOKIE_NAME = 'cookiesession'
 _COOKIE_KEY = configs.session.secret
 
 def make_signed_cookie(id, password, max_age):
@@ -137,3 +137,26 @@ def api_get_users():
     for u in users:
         u.password = '******'
     return dict(users=users)
+
+@api
+@post('/api/blogs')
+def api_create_blog():
+    i = ctx.request.input(name='', summary='', content='')
+    name = i.name.strip()
+    summary = i.summary.strip()
+    content = i.content.strip()
+    if not name:
+        raise APIValueError('name', 'name cannot be empty.')
+    if not summary:
+        raise APIValueError('summary', 'summary cannot be empty.')
+    if not content:
+        raise APIValueError('content', 'content cannot be empty.')
+    user = ctx.request.user
+    blog = Blog(user_id=user.id, user_name=user.name, summary=summary, content=content)
+    blog.insert()
+    return blog
+
+@view('manage_blog_edit.html')
+@get('/manage/blogs/create')
+def manage_blogs_create():
+    return dict(id=None, action='/api/blogs', redirect='/manage/blogs', user=ctx.request.user)
