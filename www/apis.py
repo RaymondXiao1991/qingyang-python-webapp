@@ -45,6 +45,23 @@ class APIPermissionError(APIError):
     def __init__(self, message=''):
         super(APIPermissionError, self).__init__('permission:forbidden', 'permission', message)
 
+class Page(object):
+    def __init__(self, item_count, page_index=1, page_size=10):
+        self.item_count = item_count
+        self.page_size = page_size
+        self.page_count = item_count
+        if (item_count == 0) or (page_index < 1) or (page_index > self.page_count):
+            self.offset = 0
+            self.limit = 0
+            self.page_index = 1
+        else:
+            self.page_index = page_index
+            self.offset = self.page_size * (page_index -1)
+            self.limit = self.page_size
+        self.has_next = self.page_index < self.page_count
+        self.has_previous = self.page_index > 1
+        
+
 def api(func):
     '''
     A decorator that makes a function to json api, makes the return value as json.
