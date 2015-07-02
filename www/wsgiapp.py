@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__author__ = 'Raymond Xiao'
+__author__ = ''
+
+'''
+A WSGI application entry.
+'''
 
 import logging; logging.basicConfig(level=logging.INFO)
 
@@ -45,3 +49,5 @@ wsgi.add_module(urls)
 
 if __name__ == '__main__':
     wsgi.run(9000, host='0.0.0.0')
+else:
+    application = wsgi.get_wsgi_application()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__author__ = 'Raymond Xiao'
+__author__ = ''
 
 from models import User, Blog, Comment
 

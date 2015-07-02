@@ -6,12 +6,12 @@
 
 <script>
 
-function validateEmail(email){
+function validateEmail(email) {
     var re = /^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$/;
     return re.test(email.toLowerCase());
 }
 
-$(function(){
+$(function () {
     var vm = new Vue({
         el: '#form-register',
         data: {
@@ -21,15 +21,18 @@ $(function(){
             password2: ''
         },
         methods: {
-            submit: function(event){
+            submit: function (event) {
                 event.preventDefault();
-                if(!this.name.trim()){
+                if (! this.name.trim()) {
                     return showError('请输入名字');
                 }
-                if(!validateEmail(this.email.trim().toLowerCase())){
+                if (! validateEmail(this.email.trim().toLowerCase())) {
                     return showError('请输入正确的Email地址');
                 }
-                if(this.password1 != this.password2){
+                if (this.password1.length < 6) {
+                    return showError('口令长度至少为6个字符');
+                }
+                if (this.password1 !== this.password2) {
                     return showError('两次输入的口令不一致');
                 }
                 startLoading();
@@ -37,11 +40,11 @@ $(function(){
                     name: this.name,
                     email: this.email.trim().toLowerCase(),
                     password: CryptoJS.MD5(this.password1).toString(),
-                    }, function(err, r){
-                    if(err){
+                }, function (err, r) {
+                    if (err) {
                         showError(err);
                     }
-                    else{
+                    else {
                         return location.assign('/');
                     }
                     stopLoading();
@@ -86,10 +89,9 @@ $(function(){
                 </div>
             </div>
             <div class="uk-form-row">
-                <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-user"></i>注册</button>
+                <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-user"></i> 注册</button>
             </div>
         </form>
     </div>
 
 {% endblock %}
-
